@@ -267,8 +267,8 @@ const verticalPiecesCount = 5;
   tryConnectWith(other, back = false) {
       console.log('piece', this);
       console.log('other', other);
-      const pieceId = this.metadata.id;
-      const otherId = other.metadata.id;
+      const pieceId = parseInt(this.metadata.id);
+      const otherId = parseInt(other.metadata.id);
 
       const pieceNeighbours = this.getNeighbours(pieceId);
       const otherNeighbours = this.getNeighbours(otherId);
@@ -276,11 +276,11 @@ const verticalPiecesCount = 5;
       console.log('pieceNeighbours', pieceNeighbours);
       console.log('otherNeighbours', otherNeighbours);
 
-      const areHorizontalNeighbours = pieceNeighbours.left === otherNeighbours.right
-          || pieceNeighbours.right === otherNeighbours.left;
+      const areHorizontalNeighbours = pieceNeighbours.left === otherId
+          || pieceNeighbours.right === otherId;
 
-      const areVerticalNeighbours = pieceNeighbours.top === otherNeighbours.bottom
-          || pieceNeighbours.bottom === otherNeighbours.top;
+      const areVerticalNeighbours = pieceNeighbours.top === otherId
+          || pieceNeighbours.bottom === otherId;
 
         console.log('areHorizontalNeighbours', areHorizontalNeighbours);
         console.log('areVerticalNeighbours', areVerticalNeighbours);
