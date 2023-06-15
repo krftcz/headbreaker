@@ -292,11 +292,13 @@ const verticalPiecesCount = 5;
       const otherId = parseInt(other.metadata.id);
 
       const connections = [
-          ...this.getAllConnections(this, 'topConnection'),
+          ...this.getAllConnections(this, 'upConnection'),
           ...this.getAllConnections(this, 'rightConnection'),
-          ...this.getAllConnections(this, 'bottomConnection'),
+          ...this.getAllConnections(this, 'downConnection'),
           ...this.getAllConnections(this, 'leftConnection'),
       ];
+
+      console.log(connections);
 
       if (recursive) {
           connections.forEach((connection) => {
