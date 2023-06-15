@@ -5,6 +5,9 @@ const {Connector} = require('./connector')
 const Structure = require('./structure');
 const {itself, orthogonalTransform} = require('./prelude');
 
+const horizontalPiecesCount = 10;
+const verticalPiecesCount = 5;
+
 /**
  * @callback TranslationListener
  * @param {Piece} piece
@@ -155,6 +158,32 @@ const {itself, orthogonalTransform} = require('./prelude');
     ];
   }
 
+     getNeighbours (puzzleId) {
+         puzzleId = parseInt(puzzleId, 10);
+         // Calculate the position of the tile in the grid
+         const column = (puzzleId - 1) % horizontalPiecesCount;
+         const row = Math.floor((puzzleId - 1) / horizontalPiecesCount);
+
+         // Initialize an array for neighbors
+         const neighbors = {};
+
+         // Find the neighbors of the tile
+         if (column > 0) {
+             neighbors.left = puzzleId - 1;
+         }
+         if (column < horizontalPiecesCount - 1) {
+             neighbors.right = puzzleId + 1;
+         }
+         if (row > 0) {
+             neighbors.top = puzzleId - horizontalPiecesCount;
+         }
+         if (row < verticalPiecesCount - 1) {
+             neighbors.bottom = puzzleId + horizontalPiecesCount;
+         }
+
+         return neighbors;
+     }
+
   /**
    * @param {TranslationListener} f the callback
    */
@@ -236,17 +265,29 @@ const {itself, orthogonalTransform} = require('./prelude');
    * @param {boolean} [back]
    */
   tryConnectWith(other, back = false) {
-    this.tryConnectHorizontallyWith(other, back);
-    this.tryConnectVerticallyWith(other, back);
+      const pieceId = this.metadata.id;
+      const otherId = other.metadata.id;
+
+      const pieceNeighbours = this.getNeighbours(pieceId);
+      const otherNeighbours = this.getNeighbours(otherId);
+
+      const areHorizontalNeighbours = pieceNeighbours.left === otherNeighbours.right
+          ||pieceNeighbours.right === otherNeighbours.left;
+      const areVerticalNeighbours = pieceNeighbours.top === otherNeighbours.bottom
+          ||pieceNeighbours.bottom === otherNeighbours.top;
+
+    this.tryConnectHorizontallyWith(other, back, areHorizontalNeighbours);
+    this.tryConnectVerticallyWith(other, back, areVerticalNeighbours);
   }
 
   /**
    *
    * @param {Piece} other
    * @param {boolean} [back]
+   * @param areHorizontalNeighbours
    */
-  tryConnectHorizontallyWith(other, back = false) {
-    if (this.canConnectHorizontallyWith(other)) {
+  tryConnectHorizontallyWith(other, back = false, areHorizontalNeighbours = false) {
+    if (this.canConnectHorizontallyWith(other, areHorizontalNeighbours)) {
       this.connectHorizontallyWith(other, back);
     }
   }
@@ -254,9 +295,10 @@ const {itself, orthogonalTransform} = require('./prelude');
    *
    * @param {Piece} other
    * @param {boolean} [back]
+   * @param areVerticalNeighbours
    */
-  tryConnectVerticallyWith(other, back = false) {
-    if (this.canConnectVerticallyWith(other)) {
+  tryConnectVerticallyWith(other, back = false, areVerticalNeighbours = false) {
+    if (this.canConnectVerticallyWith(other, areVerticalNeighbours)) {
       this.connectVerticallyWith(other, back);
     }
   }
@@ -424,19 +466,21 @@ const {itself, orthogonalTransform} = require('./prelude');
   /**
    *
    * @param {Piece} other
+   * @param areHorizontalNeighbours
    * @returns {boolean}
    */
-  canConnectHorizontallyWith(other) {
-    return this.horizontalConnector.canConnectWith(this, other, this.proximity);
+  canConnectHorizontallyWith(other, areHorizontalNeighbours) {
+    return areHorizontalNeighbours || this.horizontalConnector.canConnectWith(this, other, this.proximity);
   }
 
   /**
    *
    * @param {Piece} other
+   * @param areVerticalNeighbours
    * @returns {boolean}
    */
-  canConnectVerticallyWith(other) {
-    return this.verticalConnector.canConnectWith(this, other, this.proximity);
+  canConnectVerticallyWith(other, areVerticalNeighbours) {
+    return areVerticalNeighbours || this.verticalConnector.canConnectWith(this, other, this.proximity);
   }
 
   /**
