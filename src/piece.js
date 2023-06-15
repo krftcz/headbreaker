@@ -260,20 +260,47 @@ const verticalPiecesCount = 5;
     this.horizontalConnector.attract(this, other, back);
   }
 
+     getAllConnections(obj, connectionDirection) {
+         let connections = [];
+
+         // Zkontrolujte, zda objekt obsahuje vlastnost rightConnection
+         if (obj.hasOwnProperty(connectionDirection)) {
+             // Získání vlastnosti metadata, pokud existuje
+             if (obj.hasOwnProperty('metadata')) {
+                 connections.push(obj);
+             }
+
+             // Rekurzivně získání metadat ze všech vnořených objektů rightConnection
+             if (typeof obj[connectionDirection] === 'object') {
+                 connections = connections.concat(this.getAllConnections(obj[connectionDirection], connectionDirection));
+             }
+         }
+
+         return connections;
+     }
+
   /**
    * @param {Piece} other
    * @param {boolean} [back]
+   * @param recursive
    */
-  tryConnectWith(other, back = false) {
+  tryConnectWith(other, back = false, recursive = true) {
       console.log('piece', this);
       console.log('other', other);
 
       const pieceId = parseInt(this.metadata.id);
       const otherId = parseInt(other.metadata.id);
 
-      this.connections.forEach((connection) => {
+      const connections = [
+          ...this.getAllConnections(this, 'topConnection'),
+          ...this.getAllConnections(this, 'rightConnection'),
+          ...this.getAllConnections(this, 'bottomConnection'),
+          ...this.getAllConnections(this, 'leftConnection'),
+      ];
+
+      connections.forEach((connection) => {
           if (typeof connection !== 'undefined') {
-              this.tryConnectWith(connection);
+              this.tryConnectWith(connection, false, false);
           }
       });
 
