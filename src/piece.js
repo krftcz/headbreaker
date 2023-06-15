@@ -265,17 +265,25 @@ const verticalPiecesCount = 5;
    * @param {boolean} [back]
    */
   tryConnectWith(other, back = false) {
+      console.log('piece', this);
+      console.log('other', other);
       const pieceId = this.metadata.id;
       const otherId = other.metadata.id;
 
       const pieceNeighbours = this.getNeighbours(pieceId);
       const otherNeighbours = this.getNeighbours(otherId);
 
+      console.log('pieceNeighbours', pieceNeighbours);
+      console.log('otherNeighbours', otherNeighbours);
+
       const areHorizontalNeighbours = pieceNeighbours.left === otherNeighbours.right
-          ||pieceNeighbours.right === otherNeighbours.left;
+          || pieceNeighbours.right === otherNeighbours.left;
 
       const areVerticalNeighbours = pieceNeighbours.top === otherNeighbours.bottom
-          ||pieceNeighbours.bottom === otherNeighbours.top;
+          || pieceNeighbours.bottom === otherNeighbours.top;
+
+        console.log('areHorizontalNeighbours', areHorizontalNeighbours);
+        console.log('areVerticalNeighbours', areVerticalNeighbours);
 
     this.tryConnectHorizontallyWith(other, back, areHorizontalNeighbours);
     this.tryConnectVerticallyWith(other, back, areVerticalNeighbours);
