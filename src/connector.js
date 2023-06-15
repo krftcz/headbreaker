@@ -96,9 +96,9 @@ class Connector {
    * @param {boolean} back
    */
   connectWith(one, other, proximity, back) {
-    if (!this.canConnectWith(one, other, proximity)) {
-      throw new Error(`can not connect ${this.forward}!`);
-    }
+    // if (!this.canConnectWith(one, other, proximity)) {
+    // throw new Error(`can not connect ${this.forward}!`);
+    // }
     if (one[this.forwardConnection] !== other) {
       this.attract(other, one, back);
       one[this.forwardConnection] = other;
