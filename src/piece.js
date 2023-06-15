@@ -267,8 +267,15 @@ const verticalPiecesCount = 5;
   tryConnectWith(other, back = false) {
       console.log('piece', this);
       console.log('other', other);
+
       const pieceId = parseInt(this.metadata.id);
       const otherId = parseInt(other.metadata.id);
+
+      this.connections.forEach((connection) => {
+          if (typeof connection !== 'undefined') {
+              this.tryConnectWith(connection);
+          }
+      });
 
       const pieceNeighbours = this.getNeighbours(pieceId);
       const otherNeighbours = this.getNeighbours(otherId);
