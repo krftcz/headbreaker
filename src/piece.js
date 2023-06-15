@@ -273,6 +273,7 @@ const verticalPiecesCount = 5;
 
       const areHorizontalNeighbours = pieceNeighbours.left === otherNeighbours.right
           ||pieceNeighbours.right === otherNeighbours.left;
+
       const areVerticalNeighbours = pieceNeighbours.top === otherNeighbours.bottom
           ||pieceNeighbours.bottom === otherNeighbours.top;
 
@@ -470,7 +471,7 @@ const verticalPiecesCount = 5;
    * @returns {boolean}
    */
   canConnectHorizontallyWith(other, areHorizontalNeighbours) {
-    return areHorizontalNeighbours || this.horizontalConnector.canConnectWith(this, other, this.proximity);
+    return this.horizontalConnector.canConnectWith(this, other, this.proximity, areHorizontalNeighbours);
   }
 
   /**
@@ -480,7 +481,7 @@ const verticalPiecesCount = 5;
    * @returns {boolean}
    */
   canConnectVerticallyWith(other, areVerticalNeighbours) {
-    return areVerticalNeighbours || this.verticalConnector.canConnectWith(this, other, this.proximity);
+    return this.verticalConnector.canConnectWith(this, other, this.proximity, areVerticalNeighbours);
   }
 
   /**
