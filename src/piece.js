@@ -298,11 +298,13 @@ const verticalPiecesCount = 5;
           ...this.getAllConnections(this, 'leftConnection'),
       ];
 
-      connections.forEach((connection) => {
-          if (typeof connection !== 'undefined') {
-              this.tryConnectWith(connection, false, false);
-          }
-      });
+      if (recursive) {
+          connections.forEach((connection) => {
+              if (typeof connection !== 'undefined') {
+                  this.tryConnectWith(connection, false, false);
+              }
+          });
+      }
 
       const pieceNeighbours = this.getNeighbours(pieceId);
       const otherNeighbours = this.getNeighbours(otherId);
