@@ -300,13 +300,14 @@ const verticalPiecesCount = 5;
 
       console.log(connections);
 
+      /* // attempt to connect all pieces in block
       if (recursive) {
           connections.forEach((connection) => {
               if (typeof connection !== 'undefined') {
                   this.tryConnectWith(connection, false, false);
               }
           });
-      }
+      }*/
 
       const pieceNeighbours = this.getNeighbours(pieceId);
       const otherNeighbours = this.getNeighbours(otherId);
