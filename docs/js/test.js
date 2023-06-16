@@ -7,6 +7,14 @@ const gap = 5;
 const horizontalPiecesCount = 10;
 const verticalPiecesCount = 5;
 
+
+const onMoveEvent = (event) => {
+    console.log("event", event);
+};
+
+window.addEventListener('movePiece', onMoveEvent);
+
+
 const shuffler = (pieces) => {
     //pieces = pieces.sort(() => Math.random() - 0.5);
 
@@ -57,7 +65,7 @@ image.onload = () => {
         outline: new headbreaker.outline.Rounded()
     });
 
-    canvas.adjustImagesToPuzzleHeight();
+    canvas.adjustImagesToPuzzleWidth();
 
     canvas.autogenerate({
         horizontalPiecesCount,

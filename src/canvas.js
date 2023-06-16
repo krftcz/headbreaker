@@ -603,6 +603,9 @@ class Canvas {
       }
     });
     this._painter.onDragEnd(this, piece, group, () => {
+      //this.puzzle.onDragEnd(this);
+      const moveEvent = new CustomEvent('movePiece');
+      window.dispatchEvent(moveEvent);
       piece.drop();
       this.puzzle.validate();
       this.redraw();
