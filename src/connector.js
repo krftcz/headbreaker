@@ -70,9 +70,10 @@ class Connector {
    * @param other
    * @param {number} proximity
    * @param areNeighbours
+   * @param force
    * @returns {boolean}
    */
-  canConnectWith(one, other, proximity, areNeighbours = false) {
+  canConnectWith(one, other, proximity, areNeighbours = false, force = false) {
     return this.closeTo(one, other, proximity) && this.match(one, other) && this.requirement(one, other) && areNeighbours;
   }
 

@@ -8,7 +8,7 @@ const horizontalPiecesCount = 10;
 const verticalPiecesCount = 5;
 
 const shuffler = (pieces) => {
-    // pieces = pieces.sort(() => Math.random() - 0.5);
+    //pieces = pieces.sort(() => Math.random() - 0.5);
 
     const piecesPerRow = Math.floor((canvasWidth + gap) / (pieceWidth + gap));
     const piecesPerColumn = Math.floor((canvasHeight + gap) / (pieceHeight + gap));
@@ -63,9 +63,10 @@ image.onload = () => {
         horizontalPiecesCount,
         verticalPiecesCount
     });
-
     // canvas._puzzle.dragMode = DisconnectInvalid;
-    // canvas._puzzle.dragMode = ForceConnection;
+    canvas.puzzle.dragMode = headbreaker.dragMode.ForceConnection;
+    canvas._puzzle.dragMode = headbreaker.dragMode.ForceConnection;
+
 
     canvas.onConnect((_piece, figure, _target, targetFigure) => {
         figure.shape.stroke('#349e49');

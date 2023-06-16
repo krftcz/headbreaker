@@ -239,6 +239,16 @@ const verticalPiecesCount = 5;
   }
 
   /**
+   *
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param {boolean} [back]
+   */
+  connectForceVerticallyWith(_piece, other, back = false) {
+      _piece.verticalConnector.connectWith(_piece, other, this.proximity, back);
+  }
+
+  /**
    * @param {Piece} other
    */
   attractVertically(other, back = false) {
@@ -251,6 +261,15 @@ const verticalPiecesCount = 5;
    */
   connectHorizontallyWith(other, back = false) {
     this.horizontalConnector.connectWith(this, other, this.proximity, back);
+  }
+
+  /**
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param {boolean} [back]
+   */
+  connectForceHorizontallyWith(_piece, other, back = false) {
+      _piece.horizontalConnector.connectWith(_piece, other, this.proximity, back);
   }
 
   /**
@@ -279,41 +298,49 @@ const verticalPiecesCount = 5;
          return connections;
      }
 
+     getAllPresentConnections(obj, alreadyChecked) {
+         let connections = [];
+         obj.presentConnections.forEach((connection) => {
+             connections.push(connection);
+             if (!alreadyChecked.includes(obj.metadata.id)) {
+                 alreadyChecked.push(obj.metadata.id);
+                connections.push(...this.getAllPresentConnections(connection, alreadyChecked));
+             }
+         });
+
+         return connections;
+     }
+
   /**
    * @param {Piece} other
    * @param {boolean} [back]
    * @param recursive
+   * @param force
    */
-  tryConnectWith(other, back = false, recursive = true) {
-      console.log('piece', this);
-      console.log('other', other);
+  tryConnectWith(other, back = false, recursive = true, force = false) {
 
       const pieceId = parseInt(this.metadata.id);
       const otherId = parseInt(other.metadata.id);
 
       const connections = [
-          ...this.getAllConnections(this, 'upConnection'),
-          ...this.getAllConnections(this, 'rightConnection'),
-          ...this.getAllConnections(this, 'downConnection'),
-          ...this.getAllConnections(this, 'leftConnection'),
+          ...this.getAllPresentConnections(this, []),
+          ...this.getAllPresentConnections(other, []),
       ];
 
-      console.log(connections);
 
-      /* // attempt to connect all pieces in block
+
+      // attempt to connect all pieces in block
       if (recursive) {
           connections.forEach((connection) => {
               if (typeof connection !== 'undefined') {
-                  this.tryConnectWith(connection, false, false);
+                  this.tryForceConnectWith(connection, other, false, false, false);
+                  this.tryForceConnectWith(other, connection, true, false, false);
               }
           });
-      }*/
+      }
 
       const pieceNeighbours = this.getNeighbours(pieceId);
       const otherNeighbours = this.getNeighbours(otherId);
-
-      console.log('pieceNeighbours', pieceNeighbours);
-      console.log('otherNeighbours', otherNeighbours);
 
       const areHorizontalNeighbours = pieceNeighbours.left === otherId
           || pieceNeighbours.right === otherId;
@@ -321,11 +348,35 @@ const verticalPiecesCount = 5;
       const areVerticalNeighbours = pieceNeighbours.top === otherId
           || pieceNeighbours.bottom === otherId;
 
-        console.log('areHorizontalNeighbours', areHorizontalNeighbours);
-        console.log('areVerticalNeighbours', areVerticalNeighbours);
 
-    this.tryConnectHorizontallyWith(other, back, areHorizontalNeighbours);
-    this.tryConnectVerticallyWith(other, back, areVerticalNeighbours);
+    this.tryConnectHorizontallyWith(other, back, areHorizontalNeighbours, force);
+    this.tryConnectVerticallyWith(other, back, areVerticalNeighbours, force);
+  }
+
+  /**
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param {boolean} [back]
+   * @param recursive
+   * @param force
+   */
+  tryForceConnectWith(_piece, other, back = false, recursive = true, force = false) {
+
+      const pieceId = parseInt(_piece.metadata.id);
+      const otherId = parseInt(other.metadata.id);
+
+      const pieceNeighbours = this.getNeighbours(pieceId);
+      const otherNeighbours = this.getNeighbours(otherId);
+
+      const areHorizontalNeighbours = pieceNeighbours.left === otherId
+          || pieceNeighbours.right === otherId;
+
+      const areVerticalNeighbours = pieceNeighbours.top === otherId
+          || pieceNeighbours.bottom === otherId;
+
+
+    this.tryForceConnectHorizontallyWith(_piece, other, back, areHorizontalNeighbours, force);
+    this.tryForceConnectVerticallyWith(_piece, other, back, areVerticalNeighbours, force);
   }
 
   /**
@@ -334,8 +385,8 @@ const verticalPiecesCount = 5;
    * @param {boolean} [back]
    * @param areHorizontalNeighbours
    */
-  tryConnectHorizontallyWith(other, back = false, areHorizontalNeighbours = false) {
-    if (this.canConnectHorizontallyWith(other, areHorizontalNeighbours)) {
+  tryConnectHorizontallyWith(other, back = false, areHorizontalNeighbours = false, force = false) {
+    if (this.canConnectHorizontallyWith(other, areHorizontalNeighbours, force)) {
       this.connectHorizontallyWith(other, back);
     }
   }
@@ -345,9 +396,34 @@ const verticalPiecesCount = 5;
    * @param {boolean} [back]
    * @param areVerticalNeighbours
    */
-  tryConnectVerticallyWith(other, back = false, areVerticalNeighbours = false) {
-    if (this.canConnectVerticallyWith(other, areVerticalNeighbours)) {
+  tryConnectVerticallyWith(other, back = false, areVerticalNeighbours = false, force = false) {
+    if (this.canConnectVerticallyWith(other, areVerticalNeighbours, force)) {
       this.connectVerticallyWith(other, back);
+    }
+  }
+
+  /**
+   *
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param {boolean} [back]
+   * @param areHorizontalNeighbours
+   */
+  tryForceConnectHorizontallyWith(_piece, other, back = false, areHorizontalNeighbours = false, force = false) {
+    if (_piece.canForceConnectHorizontallyWith(_piece, other, areHorizontalNeighbours, force, back)) {
+        _piece.connectForceHorizontallyWith(_piece, other, back);
+    }
+  }
+  /**
+   *
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param {boolean} [back]
+   * @param areVerticalNeighbours
+   */
+  tryForceConnectVerticallyWith(_piece, other, back = false, areVerticalNeighbours = false, force = false) {
+    if (_piece.canForceConnectVerticallyWith(_piece, other, areVerticalNeighbours, force)) {
+        _piece.connectForceVerticallyWith(_piece, other, back);
     }
   }
 
@@ -515,20 +591,47 @@ const verticalPiecesCount = 5;
    *
    * @param {Piece} other
    * @param areHorizontalNeighbours
+   * @param force
    * @returns {boolean}
    */
-  canConnectHorizontallyWith(other, areHorizontalNeighbours) {
-    return this.horizontalConnector.canConnectWith(this, other, this.proximity, areHorizontalNeighbours);
+  canConnectHorizontallyWith(other, areHorizontalNeighbours, force) {
+    return this.horizontalConnector.canConnectWith(this, other, this.proximity, areHorizontalNeighbours, force);
   }
 
   /**
    *
    * @param {Piece} other
    * @param areVerticalNeighbours
+   * @param force
    * @returns {boolean}
    */
-  canConnectVerticallyWith(other, areVerticalNeighbours) {
-    return this.verticalConnector.canConnectWith(this, other, this.proximity, areVerticalNeighbours);
+  canConnectVerticallyWith(other, areVerticalNeighbours, force) {
+    return this.verticalConnector.canConnectWith(this, other, this.proximity, areVerticalNeighbours, force);
+  }
+
+  /**
+   *
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param areHorizontalNeighbours
+   * @param force
+   * @param back
+   * @returns {boolean}
+   */
+  canForceConnectHorizontallyWith(_piece, other, areHorizontalNeighbours, force, back) {
+    return _piece.horizontalConnector.canConnectWith(_piece, other, this.proximity, areHorizontalNeighbours, force);
+  }
+
+  /**
+   *
+   * @param {Piece} _piece
+   * @param {Piece} other
+   * @param areVerticalNeighbours
+   * @param force
+   * @returns {boolean}
+   */
+  canForceConnectVerticallyWith(_piece, other, areVerticalNeighbours, force) {
+    return _piece.verticalConnector.canConnectWith(_piece, other, this.proximity, areVerticalNeighbours, force);
   }
 
   /**
